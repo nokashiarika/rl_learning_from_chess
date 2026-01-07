@@ -1,61 +1,15 @@
 """
-State representation utilities for chess.
-
-This module provides helper functions for encoding chess board states.
-Supports both simple (material count) and advanced (multi-feature) encodings.
+Lesson 7: Multi-Feature State Representation
+Solution - Reference implementation
 """
 
 import chess
 import numpy as np
 
 
-def material_count(board):
-    """
-    Calculate material count difference (White - Black).
-    
-    Args:
-        board: chess.Board object
-    
-    Returns:
-        Material difference as a float
-    """
-    piece_values = {
-        chess.PAWN: 1,
-        chess.KNIGHT: 3,
-        chess.BISHOP: 3,
-        chess.ROOK: 5,
-        chess.QUEEN: 9,
-        chess.KING: 0
-    }
-    
-    white_material = 0
-    black_material = 0
-    
-    for square in chess.SQUARES:
-        piece = board.piece_at(square)
-        if piece is not None:
-            value = piece_values.get(piece.piece_type, 0)
-            if piece.color == chess.WHITE:
-                white_material += value
-            else:
-                black_material += value
-    
-    return float(white_material - black_material)
-
-
 def board_to_tensor(board):
     """
-    Convert chess board to 8x8x12 tensor representation.
-    
-    Each channel represents one piece type/color combination.
-    This preserves spatial structure for convolutional neural networks.
-    
-    Args:
-        board: chess.Board object
-    
-    Returns:
-        tensor: numpy array of shape (8, 8, 12), dtype=np.float32
-        Channels: [White Pawn, White Knight, ..., Black King]
+    Convert chess board to 8x8x12 tensor.
     """
     tensor = np.zeros((8, 8, 12), dtype=np.float32)
     
@@ -87,15 +41,7 @@ def board_to_tensor(board):
 
 def piece_square_tables(board):
     """
-    Calculate piece-square table positional values.
-    
-    Center squares are generally better than edges.
-    
-    Args:
-        board: chess.Board object
-    
-    Returns:
-        pst_score: Float, positional score (positive = good for White)
+    Calculate piece-square table values.
     """
     # Simple piece-square table: center squares are better
     pst = np.array([
@@ -126,21 +72,18 @@ def piece_square_tables(board):
     return white_score - black_score
 
 
+def mobility_and_safety(board):
+    """
+    Calculate mobility and king safety.
+    """
+    mobility = len(list(board.legal_moves))
+    in_check = 1.0 if board.is_check() else 0.0
+    return mobility, in_check
+
+
 def extract_features(board):
     """
-    Extract multi-feature vector from board position.
-    
-    Features include:
-    - Material count
-    - Piece-square table values
-    - Mobility (legal moves count)
-    - King safety (in check indicator)
-    
-    Args:
-        board: chess.Board object
-    
-    Returns:
-        features: numpy array of shape (n_features,), dtype=np.float32
+    Extract multi-feature vector from board.
     """
     piece_values = {
         chess.PAWN: 1,
@@ -170,8 +113,7 @@ def extract_features(board):
     pst = piece_square_tables(board)
     
     # Mobility and safety
-    mobility = len(list(board.legal_moves))
-    in_check = 1.0 if board.is_check() else 0.0
+    mobility, in_check = mobility_and_safety(board)
     
     # Combine features
     features = np.array([
@@ -186,24 +128,9 @@ def extract_features(board):
 
 def encode_state(board, method='hybrid'):
     """
-    Main state encoding function with multiple methods.
-    
-    Methods:
-    - 'simple': Material count only (single float) - for backward compatibility
-    - 'tensor': 8x8x12 board tensor (flattened to 768)
-    - 'features': Multi-feature vector
-    - 'hybrid': Concatenate tensor + features (best of both)
-    
-    Args:
-        board: chess.Board object
-        method: 'simple', 'tensor', 'features', or 'hybrid'
-    
-    Returns:
-        state: numpy array ready for neural network input
+    Main state encoding function.
     """
-    if method == 'simple':
-        return np.array([material_count(board)], dtype=np.float32)
-    elif method == 'tensor':
+    if method == 'tensor':
         tensor = board_to_tensor(board)
         return tensor.flatten()
     elif method == 'features':
@@ -213,5 +140,52 @@ def encode_state(board, method='hybrid'):
         features = extract_features(board)
         return np.concatenate([tensor, features])
     else:
-        raise ValueError(f"Unknown method: {method}. Choose 'simple', 'tensor', 'features', or 'hybrid'")
+        raise ValueError(f"Unknown method: {method}")
+
+
+def main():
+    """
+    Test the state representation implementation.
+    """
+    print("=== Multi-Feature State Representation Solution ===\n")
+    
+    board = chess.Board()
+    
+    # Test board tensor
+    print("1. Testing board_to_tensor()...")
+    tensor = board_to_tensor(board)
+    print(f"   ✓ Tensor shape: {tensor.shape}")
+    print(f"   ✓ Total values: {tensor.size}")
+    print(f"   ✓ Non-zero values: {np.count_nonzero(tensor)}\n")
+    
+    # Test feature extraction
+    print("2. Testing extract_features()...")
+    features = extract_features(board)
+    print(f"   ✓ Feature vector shape: {features.shape}")
+    print(f"   ✓ Features: {features}\n")
+    
+    # Test encoding methods
+    print("3. Testing encode_state() methods...")
+    
+    tensor_state = encode_state(board, method='tensor')
+    print(f"   ✓ Tensor encoding shape: {tensor_state.shape}")
+    
+    feature_state = encode_state(board, method='features')
+    print(f"   ✓ Feature encoding shape: {feature_state.shape}")
+    
+    hybrid_state = encode_state(board, method='hybrid')
+    print(f"   ✓ Hybrid encoding shape: {hybrid_state.shape}\n")
+    
+    # Compare sizes
+    print("4. Comparing encoding sizes...")
+    print(f"   Tensor: {tensor_state.size} values")
+    print(f"   Features: {feature_state.size} values")
+    print(f"   Hybrid: {hybrid_state.size} values")
+    print(f"   Original (material only): 1 value\n")
+    
+    print("=== Solution Complete ===")
+
+
+if __name__ == "__main__":
+    main()
 
