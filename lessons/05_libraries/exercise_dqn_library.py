@@ -19,7 +19,16 @@ def create_environment():
     """
     # YOUR CODE HERE
     # Hint: Import from lessons.04_gym_integration.solution_gym_wrapper
-    pass
+    import sys
+    import os
+    import importlib.util
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    gym_wrapper_path = os.path.join(base_dir, "04_gym_integration", "solution_gym_wrapper.py")
+    spec = importlib.util.spec_from_file_location("solution_gym_wrapper", gym_wrapper_path)
+    solution_gym_wrapper = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(solution_gym_wrapper)
+    ChessGymEnv = solution_gym_wrapper.ChessGymEnv
+    return ChessGymEnv()
 
 
 def train_dqn_model(env, total_timesteps=10000):
@@ -43,7 +52,9 @@ def train_dqn_model(env, total_timesteps=10000):
     - verbose=1 shows training progress
     """
     # YOUR CODE HERE
-    pass
+    model = DQN('MlpPolicy', env, verbose=1)
+    model.learn(total_timesteps=total_timesteps)
+    return model
 
 
 def evaluate_model(model, env, n_episodes=10):
@@ -61,8 +72,7 @@ def evaluate_model(model, env, n_episodes=10):
     
     Hint: Use evaluate_policy from stable_baselines3.common.evaluation
     """
-    # YOUR CODE HERE
-    pass
+    return evaluate_policy(model, env, n_eval_episodes=n_episodes, deterministic=True)
 
 
 def compare_with_q_learning(dqn_rewards, q_learning_rewards):
@@ -80,7 +90,20 @@ def compare_with_q_learning(dqn_rewards, q_learning_rewards):
     """
     # YOUR CODE HERE
     # Hint: Use np.mean() and np.std() for statistics
-    pass
+    dqn_mean = np.mean(dqn_rewards)
+    dqn_std = np.std(dqn_rewards)
+    ql_mean = np.mean(q_learning_rewards)
+    ql_std = np.std(q_learning_rewards)
+    print(f"DQN Results:")
+    print(f"  Mean reward: {dqn_mean:.2f} ± {dqn_std:.2f}")
+    print(f"Q-Learning Results:")
+    print(f"  Mean reward: {ql_mean:.2f} ± {ql_std:.2f}")
+    if dqn_mean > ql_mean:
+        print(f"\n✓ DQN performs better (difference: {dqn_mean - ql_mean:.2f})")
+    elif ql_mean > dqn_mean:
+        print(f"\n✓ Q-Learning performs better (difference: {ql_mean - dqn_mean:.2f})")
+    else:
+        print("\n≈ Both methods perform similarly")
 
 
 def main():

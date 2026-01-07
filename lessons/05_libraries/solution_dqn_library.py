@@ -17,7 +17,7 @@ def create_environment():
     import importlib.util
     
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    gym_wrapper_path = os.path.join(base_dir, "lessons", "04_gym_integration", "solution_gym_wrapper.py")
+    gym_wrapper_path = os.path.join(base_dir, "04_gym_integration", "solution_gym_wrapper.py")
     spec = importlib.util.spec_from_file_location("solution_gym_wrapper", gym_wrapper_path)
     solution_gym_wrapper = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(solution_gym_wrapper)

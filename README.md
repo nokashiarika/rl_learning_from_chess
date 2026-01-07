@@ -95,7 +95,8 @@ Before diving into the lessons, let's set up your development environment. This 
      - `python-chess` - Chess board representation and move generation
      - `numpy` - Numerical computations
      - `matplotlib` - Plotting and visualization
-     - `gym` - RL environment interface
+     - `gymnasium` - RL environment interface (formerly Gym)
+     - `shimmy` - Compatibility layer for Gym environments
      - `stable-baselines3` - RL algorithms library
      - `torch` - PyTorch for neural networks (used by stable-baselines3)
      - `pytest` - Testing framework
@@ -104,7 +105,7 @@ Before diving into the lessons, let's set up your development environment. This 
    - **Why?** These libraries provide the tools we'll use throughout the project
 
 3. **TODO 3: Verify installation**
-   - Try importing each package: `python -c "import chess; import numpy; import gym; print('All packages installed!')"`
+   - Try importing each package: `python -c "import chess; import numpy; import gymnasium; print('All packages installed!')"`
    - **Why?** Verifying ensures everything is set up correctly
 
 4. **TODO 4: Create project structure**
@@ -170,14 +171,14 @@ Before diving into the lessons, let's set up your development environment. This 
 **File**: `lessons/04_gym_integration/exercise_gym_wrapper.py`
 
 - **Your Task**:
-  - TODO 1: Inherit from `gym.Env`
+  - TODO 1: Inherit from `gymnasium.Env` (import as `import gymnasium as gym`)
   - TODO 2: Implement `reset()` returning (observation, info)
   - TODO 3: Implement `step(action)` returning (observation, reward, terminated, truncated, info)
   - TODO 4: Define `observation_space` and `action_space`
 - **Hints**: 
-  - Use `gym.spaces.Discrete` for action space
-  - Use `gym.spaces.Box` or `gym.spaces.MultiDiscrete` for observations
-- **Learning**: Gym API conventions, standardization benefits
+  - Use `gymnasium.spaces.Discrete` for action space
+  - Use `gymnasium.spaces.Box` or `gymnasium.spaces.MultiDiscrete` for observations
+- **Learning**: Gymnasium API conventions, standardization benefits
 - **Checkpoint**: Run `python -m pytest tests/test_lesson_04.py`
 - **Solution**: Check `lessons/04_gym_integration/solution_gym_wrapper.py` after attempting
 

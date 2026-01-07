@@ -5,6 +5,7 @@ Solution - Reference implementation
 
 import chess
 import random
+import numpy as np
 
 
 class ChessEnvironment:
@@ -97,7 +98,9 @@ class ChessEnvironment:
             return state, reward, done, {}
         
         # Apply agent's move (White)
-        if isinstance(action, int):
+        # Handle both Python int and numpy integer types
+        if isinstance(action, (int, np.integer)):
+            action = int(action)  # Convert to Python int
             if action >= len(legal_moves):
                 raise ValueError(f"Action {action} out of range. {len(legal_moves)} legal moves available.")
             move = legal_moves[action]

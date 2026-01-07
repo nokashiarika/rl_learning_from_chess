@@ -3,9 +3,10 @@ Lesson 4: Gym Integration
 Solution - Reference implementation
 """
 
-import gym
-from gym import spaces
+import gymnasium as gym
+from gymnasium import spaces
 import numpy as np
+import random
 
 
 class ChessGymEnv(gym.Env):
@@ -25,7 +26,7 @@ class ChessGymEnv(gym.Env):
         import importlib.util
         
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        env_path = os.path.join(base_dir, "lessons", "02_environment", "solution_environment.py")
+        env_path = os.path.join(base_dir, "02_environment", "solution_environment.py")
         spec = importlib.util.spec_from_file_location("solution_environment", env_path)
         solution_environment = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(solution_environment)
@@ -60,6 +61,24 @@ class ChessGymEnv(gym.Env):
         """
         Execute one step in the environment.
         """
+        # Get legal actions first
+        legal_actions = self.chess_env.get_legal_actions()
+        
+        if not legal_actions:
+            # No legal moves - game over
+            obs = np.array([self.chess_env.get_state()], dtype=np.float32)
+            return obs, 0.0, True, False, {}
+        
+        # Convert numpy types to Python int (Stable-Baselines3 passes numpy.int64)
+        action = int(action)
+        
+        # Validate action: clamp to valid range
+        if action >= len(legal_actions):
+            action = len(legal_actions) - 1  # Clamp to last valid action
+        if action < 0:
+            action = 0  # Clamp to first valid action
+        
+        # Now proceed with validated action
         state, reward, done, _ = self.chess_env.step(action)
         observation = np.array([state], dtype=np.float32)
         
@@ -99,17 +118,27 @@ def main():
     
     # Test step
     print("3. Testing step()...")
-    action = env.action_space.sample()
-    obs, reward, terminated, truncated, info = env.step(action)
-    print(f"   ✓ Step successful!")
-    print(f"   Observation: {obs}, Reward: {reward}")
-    print(f"   Terminated: {terminated}, Truncated: {truncated}\n")
+    # Sample from legal actions (most logical approach)
+    legal_actions = env.chess_env.get_legal_actions()
+    if legal_actions:
+        action = random.choice(legal_actions)  # Always valid!
+        obs, reward, terminated, truncated, info = env.step(action)
+        print(f"   ✓ Step successful!")
+        print(f"   Observation: {obs}, Reward: {reward}")
+        print(f"   Terminated: {terminated}, Truncated: {truncated}\n")
+    else:
+        print("   ✗ No legal actions available")
     
     # Test multiple steps
     print("4. Testing multiple steps...")
     env.reset()
     for i in range(5):
-        action = env.action_space.sample()
+        # Sample from legal actions (most logical approach)
+        legal_actions = env.chess_env.get_legal_actions()
+        if not legal_actions:
+            print(f"   Episode ended at step {i+1} (no legal moves)")
+            break
+        action = random.choice(legal_actions)  # Always valid!
         obs, reward, terminated, truncated, info = env.step(action)
         if terminated or truncated:
             print(f"   Episode ended at step {i+1}")

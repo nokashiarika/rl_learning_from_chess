@@ -128,7 +128,7 @@ def main():
     import importlib.util
     
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    env_path = os.path.join(base_dir, "lessons", "02_environment", "solution_environment.py")
+    env_path = os.path.join(base_dir, "02_environment", "solution_environment.py")
     spec = importlib.util.spec_from_file_location("solution_environment", env_path)
     solution_environment = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(solution_environment)
