@@ -44,10 +44,18 @@ RL practice/
 │   │   ├── README.md                   # Gym API introduction
 │   │   ├── exercise_gym_wrapper.py     # Wrap environment in Gym
 │   │   └── solution_gym_wrapper.py     # Reference solution
-│   └── 05_libraries/
-│       ├── README.md                   # Using stable-baselines3
-│       ├── exercise_dqn_library.py     # Implement with library
-│       └── solution_dqn_library.py     # Reference solution
+│   ├── 05_libraries/
+│   │   ├── README.md                   # Using stable-baselines3
+│   │   ├── exercise_dqn_library.py     # Implement with library
+│   │   └── solution_dqn_library.py     # Reference solution
+│   ├── 06_expectimax/
+│   │   ├── README.md                   # Game tree search algorithms
+│   │   ├── exercise_expectimax.py      # Implement minimax/expectimax/alpha-beta
+│   │   └── solution_expectimax.py      # Reference solution
+│   └── 07_state_representation/
+│       ├── README.md                   # Multi-feature state encoding
+│       ├── exercise_state_representation.py  # Implement advanced encoding
+│       └── solution_state_representation.py  # Reference solution
 ├── src/                                # Your working implementation
 │   ├── __init__.py
 │   ├── chess_env/
@@ -58,10 +66,14 @@ RL practice/
 │   │   ├── __init__.py
 │   │   ├── q_learning_scratch.py       # Build this in lesson 03
 │   │   └── dqn_stable_baselines.py     # Build this in lesson 05
-│   └── utils/
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── state_representation.py     # Helper functions (enhanced in lesson 07)
+│   │   └── visualization.py            # Plotting utilities
+│   └── models/
 │       ├── __init__.py
-│       ├── state_representation.py     # Helper functions
-│       └── visualization.py            # Plotting utilities
+│       ├── chess_cnn.py                # CNN architectures (lesson 07)
+│       └── feature_encoder.py          # Feature encoders (lesson 07)
 ├── tests/                              # Checkpoint tests
 │   ├── __init__.py
 │   ├── test_lesson_02.py               # Test your environment
@@ -199,6 +211,43 @@ Before diving into the lessons, let's set up your development environment. This 
 - **Checkpoint**: Train model, visualize learning curves
 - **Solution**: Check `lessons/05_libraries/solution_dqn_library.py` after attempting
 
+### Lesson 6: Expectimax with Alpha-Beta Pruning
+
+**File**: `lessons/06_expectimax/exercise_expectimax.py`
+
+- **Your Task**:
+  - TODO 1: Implement `evaluate_position(board)` - position evaluation function
+  - TODO 2: Implement `minimax(board, depth, maximizing_player)` - basic minimax
+  - TODO 3: Implement `expectimax(board, depth, maximizing_player)` - stochastic version
+  - TODO 4: Implement `alpha_beta(board, depth, alpha, beta, maximizing_player)` - optimized
+  - TODO 5: Implement `choose_move(board, algorithm, depth)` - move selection
+- **Hints**:
+  - Minimax: recursively evaluate all moves, maximize for White, minimize for Black
+  - Expectimax: take expected value for stochastic opponent
+  - Alpha-beta: prune branches that can't improve result (alpha >= beta)
+- **Learning**: Tree search algorithms, comparison with RL approaches
+- **Checkpoint**: Compare minimax vs alpha-beta speedup
+- **Solution**: Check `lessons/06_expectimax/solution_expectimax.py` after attempting
+
+### Lesson 7: Multi-Feature State Representation
+
+**File**: `lessons/07_state_representation/exercise_state_representation.py`
+
+- **Your Task**:
+  - TODO 1: Implement `board_to_tensor(board)` - 8x8x12 tensor encoding
+  - TODO 2: Implement `extract_features(board)` - multi-feature vector
+  - TODO 3: Implement `encode_state(board, method)` - main encoding function
+  - TODO 4: Implement `piece_square_tables(board)` - positional bonuses
+  - TODO 5: Implement `mobility_and_safety(board)` - tactical features
+- **Hints**:
+  - Board tensor: 12 channels (one per piece type/color), preserves spatial structure
+  - Features: material, piece-square tables, mobility, king safety
+  - Methods: 'tensor', 'features', or 'hybrid' (combines both)
+- **Learning**: Why single features fail, matrix operations for state encoding
+- **Checkpoint**: Compare encoding sizes, see improvement over material-only
+- **Solution**: Check `lessons/07_state_representation/solution_state_representation.py` after attempting
+- **Next Steps**: Use new encoding in environment, train with better states!
+
 ## Key Learning Objectives
 
 1. **Understanding RL Fundamentals**:
@@ -248,6 +297,9 @@ Before diving into the lessons, let's set up your development environment. This 
 - **Lesson 2**: Environment building - ~3-4 hours
 - **Lesson 3**: Q-Learning implementation - ~4-6 hours
 - **Lesson 4**: Gym integration - ~2-3 hours
+- **Lesson 5**: Using RL libraries - ~2-3 hours
+- **Lesson 6**: Expectimax with alpha-beta - ~3-4 hours
+- **Lesson 7**: Multi-feature state representation - ~3-4 hours
 - **Lesson 5**: Library usage - ~2-3 hours
 - **Total**: ~15-20 hours of guided learning
 
